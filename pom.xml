@@ -13,6 +13,8 @@
         <jfreechart.version>1.5.0</jfreechart.version>
         <guava.version>28.1-jre</guava.version>
 
+        <maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
+
         <junit.version>4.12</junit.version>
 
         <java.version>1.8</java.version>
@@ -56,7 +58,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>${maven-javadoc-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>generate-docs</id>

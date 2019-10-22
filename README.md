@@ -51,6 +51,9 @@ This project requires at least **Java 8**.
  * **JUnit**
    * Version: **4.12**
    * [Github](https://github.com/junit-team/junit4)
+ * **Apache Maven JavaDoc Plugin**
+   * Version: **3.1.1**
+   * [Github](https://github.com/apache/maven-javadoc-plugin/)
 
 ## Built With
 

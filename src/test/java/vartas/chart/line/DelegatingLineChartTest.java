@@ -4,13 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 import vartas.chart.Interval;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /*
  * Copyright (C) 2019 Zavarov
@@ -34,6 +32,55 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
     public void setUp(){
         chart = new DelegatingLineChart<>(col -> (long)col.size());
         super.init(chart);
+    }
+
+    @Test
+    public void testEvicting(){
+        chart = new DelegatingLineChart<>(col -> (long)col.size(), Duration.ZERO);
+
+        for(int i = 0 ; i < 7 ; ++i) {
+            chart.add("Entry", Instant.now(), "event");
+        }
+
+        assertTrue(chart.cache.asMap().isEmpty());
+    }
+
+    @Test
+    public void testCreateMinute(){
+        chart.setTitle("Test Line Chart (Minute)");
+        chart.setXAxisLabel("Time (UTC)");
+        chart.setYAxisLabel("Count");
+        chart.setInterval(Interval.MINUTE);
+        chart.setGranularity(ChronoUnit.MINUTES);
+
+        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
+
+        for(int i = 0 ; i < 7 ; ++i) {
+            chart.add("Minute", start.plusMinutes(2*i).toInstant(), "event");
+        }
+
+        assertNotNull(chart.create());
+
+        save("LineChartMinute");
+    }
+
+    @Test
+    public void testCreateHour(){
+        chart.setTitle("Test Line Chart (Hour)");
+        chart.setXAxisLabel("Time (UTC)");
+        chart.setYAxisLabel("Count");
+        chart.setInterval(Interval.HOUR);
+        chart.setGranularity(ChronoUnit.HOURS);
+
+        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC);
+
+        for(int i = 0 ; i < 7 ; ++i) {
+            chart.add("Entry", start.plusHours(2*i).toInstant(), "event");
+        }
+
+        assertNotNull(chart.create());
+
+        save("LineChartHour");
     }
     @Test
     public void testCreateDay(){

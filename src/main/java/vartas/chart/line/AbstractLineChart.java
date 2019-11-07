@@ -1,7 +1,11 @@
 package vartas.chart.line;
 
 import com.google.common.base.Preconditions;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -11,11 +15,13 @@ import org.jfree.data.time.TimeSeriesCollection;
 import vartas.chart.AbstractChart;
 import vartas.chart.Interval;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /*
  * Copyright (C) 2019 Zavarov
@@ -41,10 +47,23 @@ import java.util.*;
  */
 public abstract class
 AbstractLineChart <T> extends AbstractChart <T>{
-    private Map<String, Multimap<OffsetDateTime, T>> dataMap = new HashMap<>();
-    private String xAxisLabel;
-    private String yAxisLabel;
-    private Interval interval;
+    protected LoadingCache<OffsetDateTime, Multimap<String, T>> cache;
+    protected String xAxisLabel;
+    protected String yAxisLabel;
+    protected Interval interval;
+    protected ChronoUnit granularity = ChronoUnit.DAYS;
+
+    protected AbstractLineChart(CacheBuilder<Object, Object> builder){
+        cache = builder.concurrencyLevel(1).build(CacheLoader.from(key -> ArrayListMultimap.create()));
+    }
+
+    protected AbstractLineChart(){
+        this(CacheBuilder.newBuilder());
+    }
+
+    protected AbstractLineChart(Duration lifetime){
+        this(CacheBuilder.newBuilder().expireAfterWrite(lifetime));
+    }
 
     public String getXAxisLabel(){
         return xAxisLabel;
@@ -82,12 +101,8 @@ AbstractLineChart <T> extends AbstractChart <T>{
      * @param data the value of the event.
      */
     public void add(String label, Instant instant, T data){
-        dataMap.putIfAbsent(label, ArrayListMultimap.create());
-
-        //The smallest step size of the interval are days
-        OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS);
-
-        dataMap.get(label).put(sanitized, data);
+        OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
+        cache.getUnchecked(sanitized).put(label, data);
     }
 
     /**
@@ -119,10 +134,33 @@ AbstractLineChart <T> extends AbstractChart <T>{
      */
     protected abstract long count(Collection<? extends T> data);
 
+    /**
+     * The granularity defaults to {@link ChronoUnit#DAYS}
+     * @return the current granularity.
+     */
+    public ChronoUnit getGranularity(){
+        return granularity;
+    }
+
+    /**
+     * Overwrites the current granularity;
+     * @param granularity the new granularity
+     */
+    public void setGranularity(ChronoUnit granularity){
+        this.granularity = granularity;
+    }
+
     private TimeSeriesCollection createTimeSeriesCollection(){
         TimeSeriesCollection dataset = new TimeSeriesCollection(TimeZone.getTimeZone("UTC"));
 
-        dataMap.keySet().stream().map(this::createTimeSeries).forEach(dataset::addSeries);
+        cache.asMap()
+             .values()
+             .stream()
+             .map(Multimap::keySet)
+             .flatMap(Collection::stream)
+             .distinct()
+             .map(this::createTimeSeries)
+             .forEach(dataset::addSeries);
 
         return dataset;
     }
@@ -130,7 +168,8 @@ AbstractLineChart <T> extends AbstractChart <T>{
     private TimeSeries createTimeSeries(String label){
         TimeSeries series = new TimeSeries(label);
 
-        OffsetDateTime before = getNewestTimeStamp(label);
+        //Increase 'before' by a little so that the newest entry won't be skipped
+        OffsetDateTime before = getNewestTimeStamp(label).plusMinutes(1);
         OffsetDateTime after = getOldestTimeStamp(label);
 
         //Add all timestamps to the series
@@ -149,33 +188,27 @@ AbstractLineChart <T> extends AbstractChart <T>{
     }
 
     private Collection<T> accumulate(String label, OffsetDateTime end, OffsetDateTime start){
-        Collection<T> accumulator = new ArrayList<>();
-        Multimap<OffsetDateTime, T> data = dataMap.get(label);
-
-        //Iterate over all instances within the time frame
-        while(start.isBefore(end)){
-            //Gather all data samples in a single set
-            if(data.containsKey(start))
-                accumulator.addAll(data.get(start));
-            start = start.plusDays(1);
-        }
-
-        return accumulator;
+        return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().isBefore(end))
+                .filter(entry -> !entry.getKey().isBefore(start))
+                .map(Map.Entry::getValue)
+                .map(Multimap::values)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
     private OffsetDateTime getNewestTimeStamp(String label){
-        return dataMap
-                .get(label)
+        return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .keySet()
                 .stream()
                 .max(OffsetDateTime::compareTo)
-                .orElseThrow(() -> new IllegalStateException("The data set for the label "+label+" is empty."))
-                .plusDays(1);
+                .orElseThrow(() -> new IllegalStateException("The data set for the label "+label+" is empty."));
     }
 
     private OffsetDateTime getOldestTimeStamp(String label){
-        return dataMap
-                .get(label)
+        return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .keySet()
                 .stream()
                 .min(OffsetDateTime::compareTo)

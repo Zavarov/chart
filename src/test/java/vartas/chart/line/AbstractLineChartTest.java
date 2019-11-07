@@ -4,6 +4,8 @@ import org.junit.Test;
 import vartas.chart.AbstractChartTest;
 import vartas.chart.Interval;
 
+import java.time.temporal.ChronoUnit;
+
 import static org.junit.Assert.*;
 
 /*
@@ -47,5 +49,15 @@ public abstract class AbstractLineChartTest <T> extends AbstractChartTest <T>{
         assertNull(chart.getInterval());
         chart.setInterval(Interval.DAY);
         assertEquals(chart.getInterval(),Interval.DAY);
+    }
+    @Test
+    public void testGetGranularity(){
+        assertEquals(chart.getGranularity(), ChronoUnit.DAYS);
+    }
+    @Test
+    public void testSetGranularity(){
+        assertEquals(chart.getGranularity(), ChronoUnit.DAYS);
+        chart.setGranularity(ChronoUnit.MONTHS);
+        assertEquals(chart.getGranularity(), ChronoUnit.MONTHS);
     }
 }

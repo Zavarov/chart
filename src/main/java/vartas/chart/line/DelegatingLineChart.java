@@ -1,5 +1,8 @@
 package vartas.chart.line;
 
+import com.google.common.cache.CacheBuilder;
+
+import java.time.Duration;
 import java.util.Collection;
 import java.util.function.Function;
 
@@ -23,6 +26,11 @@ public class DelegatingLineChart <T> extends AbstractLineChart <T>{
     private Function<Collection<? extends T>, Long> delegator;
 
     public DelegatingLineChart(Function<Collection<? extends T>, Long> delegator){
+        this.delegator = delegator;
+    }
+
+    public DelegatingLineChart(Function<Collection<? extends T>, Long> delegator, Duration lifetime){
+        super(lifetime);
         this.delegator = delegator;
     }
 

@@ -13,6 +13,14 @@ import java.util.function.Function;
  */
 public enum Interval{
     /**
+     * Step size of a minute.
+     */
+    MINUTE(d -> d.plusMinutes(1), t -> new Minute(t, TimeZone.getTimeZone("UTC"), Locale.ENGLISH)),
+    /**
+     * Step size of an hour.
+     */
+    HOUR(d -> d.plusHours(1), t -> new Hour(t, TimeZone.getTimeZone("UTC"), Locale.ENGLISH)),
+    /**
      * Step size of a day.
      */
     DAY(d -> d.plusDays(1), t -> new Day(t, TimeZone.getTimeZone("UTC"), Locale.ENGLISH)),

@@ -21,6 +21,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /*
@@ -125,6 +126,16 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
     public Collection<T> get(S label, Instant instant){
         OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
         return cache.getUnchecked(sanitized).get(label);
+    }
+
+    /**
+     * @param label the label of the line the event belongs to.
+     * @param instant the time the event occurred.
+     * @param update the update function applied to all events.
+     */
+    public void update(S label, Instant instant, Function<T, T> update){
+        Collection<T> updated = get(label, instant).stream().map(update).collect(Collectors.toList());
+        set(label, instant, updated);
     }
 
     /**

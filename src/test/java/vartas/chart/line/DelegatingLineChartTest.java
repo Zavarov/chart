@@ -171,4 +171,14 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String, Strin
         chart.add("Label", date.toInstant(), "add");
         assertEquals(chart.get("Label", date.toInstant()), Collections.singletonList("add"));
     }
+    @Test
+    public void testUpdate(){
+        Instant date = Instant.now();
+
+        assertTrue(chart.cache.asMap().isEmpty());
+        chart.add("Label", date, "add");
+        assertEquals(chart.get("Label", date), Collections.singletonList("add"));
+        chart.update("Label", date, s -> s+s);
+        assertEquals(chart.get("Label", date), Collections.singletonList("addadd"));
+    }
 }

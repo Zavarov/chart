@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  * @param <T> the type of events that are stored in the underlying map.
  */
 public abstract class
-AbstractLineChart <S extends Comparable<S>,T> extends AbstractChart <T>{
+AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
     protected LoadingCache<OffsetDateTime, Multimap<S, T>> cache;
     protected String xAxisLabel;
     protected String yAxisLabel;

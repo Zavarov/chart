@@ -22,7 +22,7 @@ import java.util.function.Function;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class DelegatingLineChart <S extends Comparable<S>, T> extends AbstractLineChart <S, T>{
+public class DelegatingLineChart <S extends Comparable<? super S>,T> extends AbstractLineChart <S, T>{
     private Function<Collection<? extends T>, Long> delegator;
 
     public DelegatingLineChart(Function<Collection<? extends T>, Long> delegator){

@@ -24,10 +24,10 @@ import static org.junit.Assert.*;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public abstract class AbstractLineChartTest <T> extends AbstractChartTest <T>{
-    private AbstractLineChart<T> chart;
+public abstract class AbstractLineChartTest <S extends Comparable<S>, T> extends AbstractChartTest <T>{
+    private AbstractLineChart<S,T> chart;
 
-    protected void init(AbstractLineChart<T> chart){
+    protected void init(AbstractLineChart<S,T> chart){
         super.init(chart);
         this.chart = chart;
     }

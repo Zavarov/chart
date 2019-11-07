@@ -43,11 +43,12 @@ import java.util.stream.Collectors;
 /**
  * This class implements a basic line chart. <br>
  * It is possible to create plots with both a single line and multiple lines, as long as each line has a unique label.
+ * @param <S> the label of the events.
  * @param <T> the type of events that are stored in the underlying map.
  */
 public abstract class
-AbstractLineChart <T> extends AbstractChart <T>{
-    protected LoadingCache<OffsetDateTime, Multimap<String, T>> cache;
+AbstractLineChart <S extends Comparable<S>,T> extends AbstractChart <T>{
+    protected LoadingCache<OffsetDateTime, Multimap<S, T>> cache;
     protected String xAxisLabel;
     protected String yAxisLabel;
     protected Interval interval;
@@ -100,7 +101,7 @@ AbstractLineChart <T> extends AbstractChart <T>{
      * @param instant the time the event occured.
      * @param data the value of the event.
      */
-    public void add(String label, Instant instant, T data){
+    public void add(S label, Instant instant, T data){
         OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
         cache.getUnchecked(sanitized).put(label, data);
     }
@@ -165,7 +166,7 @@ AbstractLineChart <T> extends AbstractChart <T>{
         return dataset;
     }
 
-    private TimeSeries createTimeSeries(String label){
+    private TimeSeries createTimeSeries(S label){
         TimeSeries series = new TimeSeries(label);
 
         //Increase 'before' by a little so that the newest entry won't be skipped
@@ -183,11 +184,11 @@ AbstractLineChart <T> extends AbstractChart <T>{
         return series;
     }
 
-    private long collect(String label, OffsetDateTime end, OffsetDateTime start){
+    private long collect(S label, OffsetDateTime end, OffsetDateTime start){
         return count(accumulate(label, end, start));
     }
 
-    private Collection<T> accumulate(String label, OffsetDateTime end, OffsetDateTime start){
+    private Collection<T> accumulate(S label, OffsetDateTime end, OffsetDateTime start){
         return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .entrySet()
                 .stream()
@@ -199,7 +200,7 @@ AbstractLineChart <T> extends AbstractChart <T>{
                 .collect(Collectors.toList());
     }
 
-    private OffsetDateTime getNewestTimeStamp(String label){
+    private OffsetDateTime getNewestTimeStamp(S label){
         return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .keySet()
                 .stream()
@@ -207,7 +208,7 @@ AbstractLineChart <T> extends AbstractChart <T>{
                 .orElseThrow(() -> new IllegalStateException("The data set for the label "+label+" is empty."));
     }
 
-    private OffsetDateTime getOldestTimeStamp(String label){
+    private OffsetDateTime getOldestTimeStamp(S label){
         return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .keySet()
                 .stream()

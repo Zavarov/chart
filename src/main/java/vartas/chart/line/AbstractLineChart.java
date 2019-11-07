@@ -98,12 +98,33 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
 
     /**
      * @param label the label of the line the event belongs to.
-     * @param instant the time the event occured.
+     * @param instant the time the event occurred.
      * @param data the value of the event.
      */
     public void add(S label, Instant instant, T data){
         OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
         cache.getUnchecked(sanitized).put(label, data);
+    }
+
+    /**
+     *  Overwrites the previous values with the new entries.
+     * @param label the label of the line the event belongs to.
+     * @param instant the time the event occurred.
+     * @param data the new values of the event.
+     */
+    public void set(S label, Instant instant, Collection<T> data){
+        OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
+        cache.getUnchecked(sanitized).replaceValues(label, data);
+    }
+
+    /**
+     * @param label the label of the line the event belongs to.
+     * @param instant the time the event occurred.
+     * @return all events that happened during that time.
+     */
+    public Collection<T> get(S label, Instant instant){
+        OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
+        return cache.getUnchecked(sanitized).get(label);
     }
 
     /**

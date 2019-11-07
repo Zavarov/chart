@@ -6,9 +6,9 @@ import vartas.chart.Interval;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /*
  * Copyright (C) 2019 Zavarov
@@ -152,5 +152,23 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String, Strin
         assertNotNull(chart.create());
 
         save("LineChartYear");
+    }
+    @Test
+    public void testSet(){
+        OffsetDateTime date = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS);
+
+        assertTrue(chart.cache.asMap().isEmpty());
+        chart.add("Label", date.toInstant(), "add");
+        assertEquals(chart.cache.asMap().get(date).get("Label"), Collections.singletonList("add"));
+        chart.set("Label", date.toInstant(), Collections.singleton("set"));
+        assertEquals(chart.cache.asMap().get(date).get("Label"), Collections.singletonList("set"));
+    }
+    @Test
+    public void testGet(){
+        OffsetDateTime date = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS);
+
+        assertTrue(chart.cache.asMap().isEmpty());
+        chart.add("Label", date.toInstant(), "add");
+        assertEquals(chart.get("Label", date.toInstant()), Collections.singletonList("add"));
     }
 }

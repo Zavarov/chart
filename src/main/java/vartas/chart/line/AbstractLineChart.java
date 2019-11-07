@@ -113,12 +113,23 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
      */
     @Override
     public JFreeChart create(){
+        return create(cache.asMap().values().stream().map(Multimap::keySet).flatMap(Collection::stream).collect(Collectors.toSet()));
+    }
+
+
+    /**
+     * The dates on the time axis will be normalized to UTC and use their English names. <br>
+     * Additionally, the chart will always start from 0 on the Y axis.
+     * @param labels all valid chart labels.
+     * @return the chart containing all entries with the specified labels.
+     */
+    public JFreeChart create(Collection<S> labels){
         Preconditions.checkNotNull(getTitle());
         Preconditions.checkNotNull(getXAxisLabel());
         Preconditions.checkNotNull(getYAxisLabel());
         Preconditions.checkNotNull(getInterval());
 
-        TimeSeriesCollection dataset = createTimeSeriesCollection();
+        TimeSeriesCollection dataset = createTimeSeriesCollection(labels);
 
         JFreeChart chart =  ChartFactory.createTimeSeriesChart(getTitle(), getXAxisLabel(), getYAxisLabel(), dataset,true,false,false);
         //Set the default language of the months to English
@@ -151,7 +162,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
         this.granularity = granularity;
     }
 
-    private TimeSeriesCollection createTimeSeriesCollection(){
+    private TimeSeriesCollection createTimeSeriesCollection(Collection<S> lables){
         TimeSeriesCollection dataset = new TimeSeriesCollection(TimeZone.getTimeZone("UTC"));
 
         cache.asMap()
@@ -160,6 +171,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
              .map(Multimap::keySet)
              .flatMap(Collection::stream)
              .distinct()
+             .filter(lables::contains)
              .map(this::createTimeSeries)
              .forEach(dataset::addSeries);
 

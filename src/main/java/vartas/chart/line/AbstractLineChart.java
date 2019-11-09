@@ -53,7 +53,16 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
     protected LoadingCache<OffsetDateTime, Multimap<S, T>> cache;
     protected String xAxisLabel;
     protected String yAxisLabel;
+    /**
+     * The interval describes the length of the step size on the chart.<br>
+     * All values between the interval will be accumulated.
+     */
     protected Interval interval;
+    /**
+     * The granularity describes the accuracy of the values.
+     * All digits beyond the given time unit will be truncated, in order
+     * to allow events that happened close to each other to be grouped together.
+     */
     protected ChronoUnit granularity = ChronoUnit.DAYS;
 
     protected AbstractLineChart(CacheBuilder<Object, Object> builder){
@@ -77,7 +86,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
     }
 
     /**
-     * @return the current granularity of the time axis.
+     * @return the current step size of the time axis.
      */
     public Interval getInterval(){
         return interval;
@@ -92,7 +101,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
     }
 
     /**
-     * @param interval the new granularity of the time axis.
+     * @param interval the new step size of the time axis.
      */
     public void setInterval(Interval interval){
         this.interval = interval;

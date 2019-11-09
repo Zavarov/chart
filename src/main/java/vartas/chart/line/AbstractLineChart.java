@@ -240,7 +240,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
                 .filter(entry -> entry.getKey().isBefore(end))
                 .filter(entry -> !entry.getKey().isBefore(start))
                 .map(Map.Entry::getValue)
-                .map(Multimap::values)
+                .map(multimap -> multimap.get(label))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }

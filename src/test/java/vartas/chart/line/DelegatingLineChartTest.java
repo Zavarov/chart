@@ -6,6 +6,7 @@ import vartas.chart.Interval;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.Assert.*;
@@ -50,15 +51,21 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String, Strin
         chart.setTitle("Test Line Chart (Minute)");
         chart.setXAxisLabel("Time (UTC)");
         chart.setYAxisLabel("Count");
-        chart.setInterval(Interval.MINUTE);
-        chart.setGranularity(ChronoUnit.MINUTES);
+        chart.setInterval(Interval.DAY);
+        chart.setGranularity(ChronoUnit.DAYS);
 
-        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
+        Instant first = Instant.now();
+        Instant second = first.minus(1, ChronoUnit.DAYS);
 
-        for(int i = 0 ; i < 7 ; ++i) {
-            chart.add("Minute", start.plusMinutes(2*i).toInstant(), "event");
-            chart.add("Hour", start.plusHours(2*i).toInstant(), "event");
-        }
+        chart.set("A", first, Collections.singletonList("A"));
+        chart.set("B", first, Arrays.asList("B","B"));
+        chart.set("C", first, Arrays.asList("C","C","C"));
+        chart.set("D", first, Arrays.asList("D","D","D","D"));
+
+        chart.set("A", second, Collections.singletonList("A"));
+        chart.set("B", second, Arrays.asList("B","B"));
+        chart.set("C", second, Arrays.asList("C","C","C"));
+        chart.set("D", second, Arrays.asList("D","D","D","D"));
 
         assertNotNull(chart.create());
 

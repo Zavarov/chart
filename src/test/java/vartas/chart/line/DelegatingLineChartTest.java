@@ -46,6 +46,26 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String, Strin
     }
 
     @Test
+    public void testCreateMultipleLabels(){
+        chart.setTitle("Test Line Chart (Minute)");
+        chart.setXAxisLabel("Time (UTC)");
+        chart.setYAxisLabel("Count");
+        chart.setInterval(Interval.MINUTE);
+        chart.setGranularity(ChronoUnit.MINUTES);
+
+        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
+
+        for(int i = 0 ; i < 7 ; ++i) {
+            chart.add("Minute", start.plusMinutes(2*i).toInstant(), "event");
+            chart.add("Hour", start.plusHours(2*i).toInstant(), "event");
+        }
+
+        assertNotNull(chart.create());
+
+        save("LineChartMultipleLabels");
+    }
+
+    @Test
     public void testCreateMinute(){
         chart.setTitle("Test Line Chart (Minute)");
         chart.setXAxisLabel("Time (UTC)");

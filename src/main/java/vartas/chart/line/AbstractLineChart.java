@@ -21,6 +21,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -64,7 +65,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
     }
 
     protected AbstractLineChart(Duration lifetime){
-        this(CacheBuilder.newBuilder().expireAfterWrite(lifetime));
+        this(CacheBuilder.newBuilder().expireAfterWrite(lifetime.toNanos(), TimeUnit.NANOSECONDS));
     }
 
     public String getXAxisLabel(){

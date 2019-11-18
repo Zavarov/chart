@@ -39,8 +39,8 @@ public class OffsetDateTimeIteratorFunction implements BiFunction<OffsetDateTime
         this.next = next;
     }
     /**
-     * @param before the time stamp of the newest submission.
-     * @param after the time stamp of the oldest submission.
+     * @param before the (inclusive) time stamp of the newest submission.
+     * @param after the (exclusive) time stamp of the oldest submission.
      * @return an iterator that visits all time stamps in between.
      */
     @Override

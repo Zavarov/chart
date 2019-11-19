@@ -1,9 +1,8 @@
 package vartas.chart.line;
 
-import com.google.common.cache.CacheBuilder;
-
 import java.time.Duration;
 import java.util.Collection;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /*
@@ -22,20 +21,28 @@ import java.util.function.Function;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class DelegatingLineChart <S extends Comparable<? super S>,T> extends AbstractLineChart <S, T>{
-    private Function<Collection<? extends T>, Long> delegator;
+public class DelegatingLineChart <T> extends AbstractLineChart <T>{
+    private BiFunction<String, Collection<? extends T>, Long> delegator;
 
-    public DelegatingLineChart(Function<Collection<? extends T>, Long> delegator){
+    public DelegatingLineChart(BiFunction<String, Collection<? extends T>, Long> delegator){
         this.delegator = delegator;
     }
 
-    public DelegatingLineChart(Function<Collection<? extends T>, Long> delegator, Duration lifetime){
+    public DelegatingLineChart(Function<Collection<? extends T>, Long> delegator){
+        this((u,v) -> delegator.apply(v));
+    }
+
+    public DelegatingLineChart(BiFunction<String, Collection<? extends T>, Long> delegator, Duration lifetime){
         super(lifetime);
         this.delegator = delegator;
     }
 
+    public DelegatingLineChart(Function<Collection<? extends T>, Long> delegator, Duration lifetime){
+        this((u,v) -> delegator.apply(v), lifetime);
+    }
+
     @Override
-    protected long count(Collection<? extends T> data) {
-        return delegator.apply(data);
+    protected long count(String key, Collection<? extends T> data) {
+        return delegator.apply(key, data);
     }
 }

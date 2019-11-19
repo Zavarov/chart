@@ -45,12 +45,11 @@ import java.util.stream.Collectors;
 /**
  * This class implements a basic line chart. <br>
  * It is possible to create plots with both a single line and multiple lines, as long as each line has a unique label.
- * @param <S> the label of the events.
  * @param <T> the type of events that are stored in the underlying map.
  */
 public abstract class
-AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
-    protected LoadingCache<OffsetDateTime, Multimap<S, T>> cache;
+AbstractLineChart <T> extends AbstractChart <T>{
+    protected LoadingCache<OffsetDateTime, Multimap<String, T>> cache;
     protected String xAxisLabel;
     protected String yAxisLabel;
     /**
@@ -112,7 +111,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
      * @param instant the time the event occurred.
      * @param data the value of the event.
      */
-    public void add(S label, Instant instant, T data){
+    public void add(String label, Instant instant, T data){
         OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
         cache.getUnchecked(sanitized).put(label, data);
     }
@@ -123,7 +122,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
      * @param instant the time the event occurred.
      * @param data the new values of the event.
      */
-    public void set(S label, Instant instant, Collection<T> data){
+    public void set(String label, Instant instant, Collection<T> data){
         OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
         cache.getUnchecked(sanitized).replaceValues(label, data);
     }
@@ -133,7 +132,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
      * @param instant the time the event occurred.
      * @return all events that happened during that time.
      */
-    public Collection<T> get(S label, Instant instant){
+    public Collection<T> get(String label, Instant instant){
         OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
         return cache.getUnchecked(sanitized).get(label);
     }
@@ -143,7 +142,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
      * @param instant the time the event occurred.
      * @param update the update function applied to all events.
      */
-    public void update(S label, Instant instant, Function<T, T> update){
+    public void update(String label, Instant instant, Function<T, T> update){
         Collection<T> updated = get(label, instant).stream().map(update).collect(Collectors.toList());
         set(label, instant, updated);
     }
@@ -165,7 +164,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
      * @param labels all valid chart labels.
      * @return the chart containing all entries with the specified labels.
      */
-    public JFreeChart create(Collection<S> labels){
+    public JFreeChart create(Collection<String> labels){
         Preconditions.checkNotNull(getTitle());
         Preconditions.checkNotNull(getXAxisLabel());
         Preconditions.checkNotNull(getYAxisLabel());
@@ -183,10 +182,11 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
         return chart;
     }
     /**
+     * @param key the label the data belongs to.
      * @param data all elements in the given interval.
      * @return the number representing those elements.
      */
-    protected abstract long count(Collection<? extends T> data);
+    protected abstract long count(String key, Collection<? extends T> data);
 
     /**
      * The granularity defaults to {@link ChronoUnit#DAYS}
@@ -204,7 +204,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
         this.granularity = granularity;
     }
 
-    private TimeSeriesCollection createTimeSeriesCollection(Collection<S> lables){
+    private TimeSeriesCollection createTimeSeriesCollection(Collection<String> lables){
         TimeSeriesCollection dataset = new TimeSeriesCollection(TimeZone.getTimeZone("UTC"));
 
         cache.asMap()
@@ -220,7 +220,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
         return dataset;
     }
 
-    private TimeSeries createTimeSeries(S label){
+    private TimeSeries createTimeSeries(String label){
         TimeSeries series = new TimeSeries(label);
 
         //Increase 'before' by a little so that the newest entry won't be skipped
@@ -238,11 +238,11 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
         return series;
     }
 
-    private long collect(S label, OffsetDateTime end, OffsetDateTime start){
-        return count(accumulate(label, end, start));
+    private long collect(String label, OffsetDateTime end, OffsetDateTime start){
+        return count(label, accumulate(label, end, start));
     }
 
-    private Collection<T> accumulate(S label, OffsetDateTime end, OffsetDateTime start){
+    private Collection<T> accumulate(String label, OffsetDateTime end, OffsetDateTime start){
         return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .entrySet()
                 .stream()
@@ -254,7 +254,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
                 .collect(Collectors.toList());
     }
 
-    private OffsetDateTime getNewestTimeStamp(S label){
+    private OffsetDateTime getNewestTimeStamp(String label){
         return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .keySet()
                 .stream()
@@ -262,7 +262,7 @@ AbstractLineChart <S extends Comparable<? super S>,T> extends AbstractChart <T>{
                 .orElseThrow(() -> new IllegalStateException("The data set for the label "+label+" is empty."));
     }
 
-    private OffsetDateTime getOldestTimeStamp(S label){
+    private OffsetDateTime getOldestTimeStamp(String label){
         return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .keySet()
                 .stream()

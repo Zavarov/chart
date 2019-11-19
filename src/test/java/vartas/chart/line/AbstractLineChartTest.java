@@ -6,7 +6,8 @@ import vartas.chart.Interval;
 
 import java.time.temporal.ChronoUnit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /*
  * Copyright (C) 2019 Zavarov
@@ -24,10 +25,10 @@ import static org.junit.Assert.*;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public abstract class AbstractLineChartTest <S extends Comparable<S>, T> extends AbstractChartTest <T>{
-    private AbstractLineChart<S,T> chart;
+public abstract class AbstractLineChartTest <T> extends AbstractChartTest <T>{
+    private AbstractLineChart<T> chart;
 
-    protected void init(AbstractLineChart<S,T> chart){
+    protected void init(AbstractLineChart<T> chart){
         super.init(chart);
         this.chart = chart;
     }

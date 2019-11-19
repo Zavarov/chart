@@ -27,8 +27,8 @@ import static org.junit.Assert.*;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class DelegatingLineChartTest extends AbstractLineChartTest<String, String>{
-    private DelegatingLineChart<String, String> chart;
+public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
+    private DelegatingLineChart<String> chart;
     @Before
     public void setUp(){
         chart = new DelegatingLineChart<>(col -> (long)col.size());

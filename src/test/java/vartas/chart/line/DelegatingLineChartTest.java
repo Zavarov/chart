@@ -73,6 +73,26 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
     }
 
     @Test
+    public void testCreateStepsize(){
+        chart.setTitle("Test Line Chart (15 Minutes)");
+        chart.setXAxisLabel("Time (UTC)");
+        chart.setYAxisLabel("Count");
+        chart.setInterval(Interval.MINUTE);
+        chart.setGranularity(ChronoUnit.MINUTES);
+        chart.setStepSize(15);
+
+        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
+
+        for(int i = 0 ; i < 7 ; ++i) {
+            chart.add("Minute", start.plusMinutes(2*i*15).toInstant(), "event");
+        }
+
+        assertNotNull(chart.create());
+
+        save("LineChartStepsize");
+    }
+
+    @Test
     public void testCreateMinute(){
         chart.setTitle("Test Line Chart (Minute)");
         chart.setXAxisLabel("Time (UTC)");

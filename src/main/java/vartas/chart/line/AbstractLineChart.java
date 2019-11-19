@@ -63,6 +63,10 @@ AbstractLineChart <T> extends AbstractChart <T>{
      * to allow events that happened close to each other to be grouped together.
      */
     protected ChronoUnit granularity = ChronoUnit.DAYS;
+    /**
+     * The step size
+     */
+    protected int stepsize = 1;
 
     protected AbstractLineChart(CacheBuilder<Object, Object> builder){
         cache = builder.concurrencyLevel(1).build(CacheLoader.from(key -> ArrayListMultimap.create()));
@@ -197,11 +201,25 @@ AbstractLineChart <T> extends AbstractChart <T>{
     }
 
     /**
-     * Overwrites the current granularity;
      * @param granularity the new granularity
      */
     public void setGranularity(ChronoUnit granularity){
         this.granularity = granularity;
+    }
+
+    /**
+     * The step size defaults to 1.
+     * @return the current step size.
+     */
+    public int getStepSize(){
+        return stepsize;
+    }
+
+    /**
+     * @param stepsize the new step size.
+     */
+    public void setStepSize(int stepsize){
+        this.stepsize = stepsize;
     }
 
     private TimeSeriesCollection createTimeSeriesCollection(Collection<String> lables){
@@ -228,7 +246,7 @@ AbstractLineChart <T> extends AbstractChart <T>{
         OffsetDateTime after = getOldestTimeStamp(label);
 
         //Add all timestamps to the series
-        Iterator<OffsetDateTime> iterator = interval.getIteratorFunction().apply(before, after);
+        Iterator<OffsetDateTime> iterator = interval.getIteratorFunction(stepsize).apply(before, after);
         OffsetDateTime current = after, next;
         while(iterator.hasNext()){
             next = iterator.next();

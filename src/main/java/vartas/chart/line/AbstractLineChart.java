@@ -126,7 +126,7 @@ AbstractLineChart <T> extends AbstractChart <T>{
      * @param instant the time the event occurred.
      * @param data the new values of the event.
      */
-    public void set(String label, Instant instant, Collection<T> data){
+    public void set(String label, Instant instant, Collection<? extends T> data){
         OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
         cache.getUnchecked(sanitized).replaceValues(label, data);
     }

@@ -49,12 +49,12 @@ public enum Interval{
     private final Function<Date,RegularTimePeriod> period;
     /**
      * @param start the (inclusive) minimum age of the entries.
-     * @param end the (exclusive) maximum age of the entries.
+     * @param end the (inclusive) maximum age of the entries.
      * @param stepsize the distance between two entries with respect to the interval.
      * @return all dates in the specified interval.
      */
     public Stream<LocalDateTime> getDates(LocalDateTime start, LocalDateTime end, int stepsize){
-        return Stream.iterate(start, d -> d.isBefore(end), d -> step.apply(d, stepsize));
+        return Stream.iterate(start, d -> !d.isAfter(end), d -> step.apply(d, stepsize));
     }
     /**
      * @param time the current time stamp.

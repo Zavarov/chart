@@ -239,26 +239,26 @@ AbstractLineChart <T> extends AbstractChart <T>{
     private TimeSeries createTimeSeries(String label){
         TimeSeries series = new TimeSeries(label);
 
-        //Increase 'start' by a little so that the newest entry won't be skipped
-        LocalDateTime start = getEnd(label).plusMinutes(1);
-        LocalDateTime end = getStart(label);
+        //Increase by 1 <=> Visit [end, end+1]
+        LocalDateTime end = getEnd(label).plus(1, granularity);
+        LocalDateTime start = getStart(label);
 
         //Add all timestamps to the series
-        Iterator<LocalDateTime> iterator = interval.getDates(end, start, stepsize).iterator();
+        Iterator<LocalDateTime> iterator = interval.getDates(start, end, stepsize).iterator();
         LocalDateTime current = iterator.next(), next;
         while(iterator.hasNext()){
             next = iterator.next();
-            series.add(interval.getTimePeriod(current), collect(label, next, current));
+            series.add(interval.getTimePeriod(current), collect(label, current, next));
             current = next;
         }
         return series;
     }
 
-    private long collect(String label, LocalDateTime end, LocalDateTime start){
-        return count(label, accumulate(label, end, start));
+    private long collect(String label, LocalDateTime start, LocalDateTime end){
+        return count(label, accumulate(label, start, end));
     }
 
-    private Collection<T> accumulate(String label, LocalDateTime end, LocalDateTime start){
+    private Collection<T> accumulate(String label, LocalDateTime start, LocalDateTime end){
         return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .entrySet()
                 .stream()

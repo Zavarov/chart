@@ -50,7 +50,7 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
 
     @Test
     public void testCreateMultipleLabels(){
-        chart.setTitle("Test Line Chart (Minute)");
+        chart.setTitle("Test Line Chart (Multiple labels)");
         chart.setXAxisLabel("Time (UTC)");
         chart.setYAxisLabel("Count");
         chart.setInterval(Interval.DAY);

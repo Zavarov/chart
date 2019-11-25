@@ -2,11 +2,9 @@ package vartas.chart.pie;
 
 import org.junit.Before;
 import org.junit.Test;
-import vartas.chart.line.DelegatingLineChart;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -35,7 +33,7 @@ public class DelegatingPieChartTest extends AbstractPieChartTest<String>{
     public void setUp(){
         Function<Collection<? extends String>, Map<String,Long>> mapper;
 
-        mapper = col -> col.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        mapper = col -> col.stream().collect(Collectors.groupingBy(l -> l, Collectors.counting()));
         chart = new DelegatingPieChart<>(mapper);
 
         super.init(chart);

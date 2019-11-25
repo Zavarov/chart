@@ -16,9 +16,7 @@ import vartas.chart.AbstractChart;
 import vartas.chart.Interval;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +47,7 @@ import java.util.stream.Collectors;
  */
 public abstract class
 AbstractLineChart <T> extends AbstractChart <T>{
-    protected LoadingCache<OffsetDateTime, Multimap<String, T>> cache;
+    protected LoadingCache<LocalDateTime, Multimap<String, T>> cache;
     protected String xAxisLabel;
     protected String yAxisLabel;
     /**
@@ -115,8 +113,8 @@ AbstractLineChart <T> extends AbstractChart <T>{
      * @param instant the time the event occurred.
      * @param data the value of the event.
      */
-    public void add(String label, Instant instant, T data){
-        OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
+    public void add(String label, LocalDateTime instant, T data){
+        LocalDateTime sanitized = instant.truncatedTo(granularity);
         cache.getUnchecked(sanitized).put(label, data);
     }
 
@@ -126,8 +124,8 @@ AbstractLineChart <T> extends AbstractChart <T>{
      * @param instant the time the event occurred.
      * @param data the new values of the event.
      */
-    public void set(String label, Instant instant, Collection<? extends T> data){
-        OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
+    public void set(String label, LocalDateTime instant, Collection<? extends T> data){
+        LocalDateTime sanitized = instant.truncatedTo(granularity);
         cache.getUnchecked(sanitized).replaceValues(label, data);
     }
 
@@ -136,8 +134,8 @@ AbstractLineChart <T> extends AbstractChart <T>{
      * @param instant the time the event occurred.
      * @return all events that happened during that time.
      */
-    public Collection<T> get(String label, Instant instant){
-        OffsetDateTime sanitized = instant.atOffset(ZoneOffset.UTC).truncatedTo(granularity);
+    public Collection<T> get(String label, LocalDateTime instant){
+        LocalDateTime sanitized = instant.truncatedTo(granularity);
         return cache.getUnchecked(sanitized).get(label);
     }
 
@@ -146,7 +144,7 @@ AbstractLineChart <T> extends AbstractChart <T>{
      * @param instant the time the event occurred.
      * @param update the update function applied to all events.
      */
-    public void update(String label, Instant instant, Function<T, T> update){
+    public void update(String label, LocalDateTime instant, Function<T, T> update){
         Collection<T> updated = get(label, instant).stream().map(update).collect(Collectors.toList());
         set(label, instant, updated);
     }
@@ -241,13 +239,13 @@ AbstractLineChart <T> extends AbstractChart <T>{
     private TimeSeries createTimeSeries(String label){
         TimeSeries series = new TimeSeries(label);
 
-        //Increase 'before' by a little so that the newest entry won't be skipped
-        OffsetDateTime before = getNewestTimeStamp(label).plusMinutes(1);
-        OffsetDateTime after = getOldestTimeStamp(label);
+        //Increase 'start' by a little so that the newest entry won't be skipped
+        LocalDateTime start = getEnd(label).plusMinutes(1);
+        LocalDateTime end = getStart(label);
 
         //Add all timestamps to the series
-        Iterator<OffsetDateTime> iterator = interval.getIteratorFunction(stepsize).apply(before, after);
-        OffsetDateTime current = after, next;
+        Iterator<LocalDateTime> iterator = interval.getDates(end, start, stepsize).iterator();
+        LocalDateTime current = iterator.next(), next;
         while(iterator.hasNext()){
             next = iterator.next();
             series.add(interval.getTimePeriod(current), collect(label, next, current));
@@ -256,11 +254,11 @@ AbstractLineChart <T> extends AbstractChart <T>{
         return series;
     }
 
-    private long collect(String label, OffsetDateTime end, OffsetDateTime start){
+    private long collect(String label, LocalDateTime end, LocalDateTime start){
         return count(label, accumulate(label, end, start));
     }
 
-    private Collection<T> accumulate(String label, OffsetDateTime end, OffsetDateTime start){
+    private Collection<T> accumulate(String label, LocalDateTime end, LocalDateTime start){
         return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .entrySet()
                 .stream()
@@ -272,19 +270,19 @@ AbstractLineChart <T> extends AbstractChart <T>{
                 .collect(Collectors.toList());
     }
 
-    private OffsetDateTime getNewestTimeStamp(String label){
+    private LocalDateTime getEnd(String label){
         return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .keySet()
                 .stream()
-                .max(OffsetDateTime::compareTo)
+                .max(LocalDateTime::compareTo)
                 .orElseThrow(() -> new IllegalStateException("The data set for the label "+label+" is empty."));
     }
 
-    private OffsetDateTime getOldestTimeStamp(String label){
+    private LocalDateTime getStart(String label){
         return Maps.filterValues(cache.asMap(), value -> value.containsKey(label))
                 .keySet()
                 .stream()
-                .min(OffsetDateTime::compareTo)
+                .min(LocalDateTime::compareTo)
                 .orElseThrow(() -> new IllegalStateException("The data set for the label "+label+" is empty."));
     }
 }

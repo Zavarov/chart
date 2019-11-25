@@ -4,7 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import vartas.chart.Interval;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +42,7 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
         chart = new DelegatingLineChart<>(col -> (long)col.size(), Duration.ZERO);
 
         for(int i = 0 ; i < 7 ; ++i) {
-            chart.add("Entry", Instant.now(), "event");
+            chart.add("Entry", LocalDateTime.now(), "event");
         }
 
         assertTrue(chart.cache.asMap().isEmpty());
@@ -54,8 +56,8 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
         chart.setInterval(Interval.DAY);
         chart.setGranularity(ChronoUnit.DAYS);
 
-        Instant first = Instant.now();
-        Instant second = first.minus(1, ChronoUnit.DAYS);
+        LocalDateTime first = LocalDateTime.now();
+        LocalDateTime second = first.minus(1, ChronoUnit.DAYS);
 
         chart.set("A", first, Collections.singletonList("A"));
         chart.set("B", first, Arrays.asList("B","B"));
@@ -81,10 +83,10 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
         chart.setGranularity(ChronoUnit.MINUTES);
         chart.setStepSize(15);
 
-        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
+        LocalDateTime start = LocalDateTime.now();
 
         for(int i = 0 ; i < 7 ; ++i) {
-            chart.add("Minute", start.plusMinutes(2*i*15).toInstant(), "event");
+            chart.add("Minute", start.plusMinutes(2*i*15), "event");
         }
 
         assertNotNull(chart.create());
@@ -100,10 +102,10 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
         chart.setInterval(Interval.MINUTE);
         chart.setGranularity(ChronoUnit.MINUTES);
 
-        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES);
+        LocalDateTime start = LocalDateTime.now();
 
         for(int i = 0 ; i < 7 ; ++i) {
-            chart.add("Minute", start.plusMinutes(2*i).toInstant(), "event");
+            chart.add("Minute", start.plusMinutes(2*i), "event");
         }
 
         assertNotNull(chart.create());
@@ -119,10 +121,10 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
         chart.setInterval(Interval.HOUR);
         chart.setGranularity(ChronoUnit.HOURS);
 
-        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC);
+        LocalDateTime start = LocalDateTime.now();
 
         for(int i = 0 ; i < 7 ; ++i) {
-            chart.add("Entry", start.plusHours(2*i).toInstant(), "event");
+            chart.add("Entry", start.plusHours(2*i), "event");
         }
 
         assertNotNull(chart.create());
@@ -136,10 +138,10 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
         chart.setYAxisLabel("Count");
         chart.setInterval(Interval.DAY);
 
-        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime start = LocalDateTime.now();
 
         for(int i = 0 ; i < 7 ; ++i) {
-            chart.add("Day", start.plus(Period.ofDays(i*2)).toInstant(), "event");
+            chart.add("Day", start.plus(Period.ofDays(i*2)), "event");
         }
 
         assertNotNull(chart.create());
@@ -154,10 +156,10 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
         chart.setYAxisLabel("Count");
         chart.setInterval(Interval.WEEK);
 
-        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime start = LocalDateTime.now();
 
         for(int i = 0 ; i < 7 ; ++i) {
-            chart.add("Week", start.plus(Period.ofWeeks(i*2)).toInstant(), "event");
+            chart.add("Week", start.plus(Period.ofWeeks(i*2)), "event");
         }
 
         assertNotNull(chart.create());
@@ -172,10 +174,10 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
         chart.setYAxisLabel("Count");
         chart.setInterval(Interval.MONTH);
 
-        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime start = LocalDateTime.now();
 
         for(int i = 0 ; i < 7 ; ++i) {
-            chart.add("Month", start.plus(Period.ofMonths(i*2)).toInstant(), "event");
+            chart.add("Month", start.plus(Period.ofMonths(i*2)), "event");
         }
 
         assertNotNull(chart.create());
@@ -190,10 +192,10 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
         chart.setYAxisLabel("Count");
         chart.setInterval(Interval.YEAR);
 
-        OffsetDateTime start = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime start = LocalDateTime.now();
 
         for(int i = 0 ; i < 7 ; ++i) {
-            chart.add("Year", start.plus(Period.ofYears(i*2)).toInstant(), "event");
+            chart.add("Year", start.plus(Period.ofYears(i*2)), "event");
         }
 
         assertNotNull(chart.create());
@@ -202,25 +204,25 @@ public class DelegatingLineChartTest extends AbstractLineChartTest<String>{
     }
     @Test
     public void testSet(){
-        OffsetDateTime date = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime date = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
 
         assertTrue(chart.cache.asMap().isEmpty());
-        chart.add("Label", date.toInstant(), "add");
+        chart.add("Label", date, "add");
         assertEquals(chart.cache.asMap().get(date).get("Label"), Collections.singletonList("add"));
-        chart.set("Label", date.toInstant(), Collections.singleton("set"));
+        chart.set("Label", date, Collections.singleton("set"));
         assertEquals(chart.cache.asMap().get(date).get("Label"), Collections.singletonList("set"));
     }
     @Test
     public void testGet(){
-        OffsetDateTime date = Instant.now().atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime date = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
 
         assertTrue(chart.cache.asMap().isEmpty());
-        chart.add("Label", date.toInstant(), "add");
-        assertEquals(chart.get("Label", date.toInstant()), Collections.singletonList("add"));
+        chart.add("Label", date, "add");
+        assertEquals(chart.get("Label", date), Collections.singletonList("add"));
     }
     @Test
     public void testUpdate(){
-        Instant date = Instant.now();
+        LocalDateTime date = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
 
         assertTrue(chart.cache.asMap().isEmpty());
         chart.add("Label", date, "add");

@@ -13,8 +13,6 @@
         <jfreechart.version>1.5.0</jfreechart.version>
         <guava.version>28.1-jre</guava.version>
 
-        <maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
-
         <junit.version>4.12</junit.version>
 
         <java.version>11</java.version>
@@ -23,6 +21,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
+        <maven.compiler.version>3.8.1</maven.compiler.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
@@ -67,6 +67,15 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

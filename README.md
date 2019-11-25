@@ -14,7 +14,7 @@ The given example will plot the total number of events that occured during each 
 ```
 public class ConcreteLineChart extends AbstractLineChart<String>{
     @Override
-    protected long count(Collection<? extends String> data) {
+    protected long count(String key, Collection<? extends String> data) {
         return data.size();
     }
 }
@@ -24,10 +24,10 @@ public class ConcreteLineChart extends AbstractLineChart<String>{
 
 The resulting plot will be equivalent to the previous example, but this time it is created via the delegator class.
 ```
-    Function<Collection<? extends String>, Long> mapper;
+    BiFunction<String, Collection<? extends String>, Long> mapper;
     DelegatingLineChart<String> chart;
     
-    mapper = col -> (long)col.size();
+    mapper = (key,col) -> (long)col.size();
     chart = new DelegatingLineChart<>(mapper);
 ```
 
@@ -41,7 +41,7 @@ mvn clean install
 
 ## Dependencies:
 
-This project requires at least **Java 8**.
+This project requires at least **Java 11**.
  * **JFreeChart**
    * Version: **1.5**
    * [Github](https://github.com/jfree/jfreechart)
@@ -51,13 +51,17 @@ This project requires at least **Java 8**.
  * **JUnit**
    * Version: **4.12**
    * [Github](https://github.com/junit-team/junit4)
+
+## Plugins:
+ * **Apache Maven Compiler Plugin**
+   * Version: **3.8.1**
+   * [Github](https://github.com/apache/maven-compiler-plugin)
  * **Apache Maven JavaDoc Plugin**
    * Version: **3.1.1**
-   * [Github](https://github.com/apache/maven-javadoc-plugin/)
+   * [Github](https://github.com/apache/maven-javadoc-plugin)
 
 ## Built With
 
-* [MontiCore](https://github.com/MontiCore/monticore) - The language workbench for the comment and submission grammar in the io module.
 * [Maven](https://maven.apache.org/) - Dependency Management
 
 ## Authors

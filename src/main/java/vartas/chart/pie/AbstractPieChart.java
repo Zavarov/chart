@@ -1,6 +1,9 @@
 package vartas.chart.pie;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.PieSectionLabelGenerator;
@@ -10,9 +13,10 @@ import org.jfree.data.general.DefaultPieDataset;
 import vartas.chart.AbstractChart;
 
 import java.awt.*;
-import java.util.*;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
 
 /*
  * Copyright (C) 2019 Zavarov
@@ -33,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractPieChart <T> extends AbstractChart <T> {
     private double alpha = 0.0;
-    private Collection<T> dataCollection = new ArrayList<>();
+    private Multimap<String, T> data = LinkedListMultimap.create();
 
     /**
      * Overwrites the current alpha value. <br>
@@ -52,32 +56,37 @@ public abstract class AbstractPieChart <T> extends AbstractChart <T> {
     }
 
     /**
-     * Adds a single element to the underlying list.
-     * @param data the new element.
+     * Adds a single key-value pair to the chart.<br>
+     * If the key is already used, the new element is simply appended to the existing data.
+     * @param key the unique key for this value.
+     * @param value the value associated with the key.
      */
-    public void add(T data){
-        dataCollection.add(data);
+    public void add(String key, T value){
+        addAll(key, Collections.singleton(value));
     }
 
     /**
      * Adds all elements in the collection to the underlying list.
-     * @param dataCollection all elements that are added to the underlying list.
+     * If the key is already used, the new elements are simply appended to the existing data.
+     * @param key the unique key for the values.
+     * @param values the values associated with the key.
      */
-    public void addAll(Collection<? extends T> dataCollection){
-        this.dataCollection.addAll(dataCollection);
+    public void addAll(String key, Collection<? extends T> values){
+        this.data.putAll(key, values);
     }
 
     /**
-     * @param data all elements that have been added up to this point.
-     * @return a map containing all distinct entries in the data set and how often they appeared.
+     * @param key the unique key associated with the values.
+     * @param values the values associated with the key.
+     * @return a value associated with the key-value pair.
      */
-    public abstract Map<String,Long> count(Collection<? extends T> data);
+    public abstract Long count(String key, Collection<? extends T> values);
 
     @Override
     public JFreeChart create(){
         Preconditions.checkNotNull(getTitle());
 
-        Map<String, Long> data = count(dataCollection);
+        Map<String, Long> data = Maps.transformEntries(this.data.asMap(), this::count);
 
         DefaultPieDataset dataset = createDataSet(data);
 

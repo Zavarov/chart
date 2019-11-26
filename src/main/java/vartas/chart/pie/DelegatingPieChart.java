@@ -1,8 +1,7 @@
 package vartas.chart.pie;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /*
  * Copyright (C) 2019 Zavarov
@@ -21,13 +20,13 @@ import java.util.function.Function;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class DelegatingPieChart <T> extends AbstractPieChart <T>{
-    private Function<Collection<? extends T>, Map<String, Long>> delegator;
+    private BiFunction<String, Collection<? extends T>, Long> delegator;
 
-    public DelegatingPieChart(Function<Collection<? extends T>, Map<String, Long>> delegator){
+    public DelegatingPieChart(BiFunction<String, Collection<? extends T>, Long> delegator){
         this.delegator = delegator;
     }
     @Override
-    public Map<String, Long> count(Collection<? extends T> data) {
-        return delegator.apply(data);
+    public Long count(String key, Collection<? extends T> value) {
+        return delegator.apply(key, value);
     }
 }

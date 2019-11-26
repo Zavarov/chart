@@ -3,11 +3,12 @@ package vartas.chart.pie;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -31,9 +32,9 @@ public class DelegatingPieChartTest extends AbstractPieChartTest<String>{
     private DelegatingPieChart<String> chart;
     @Before
     public void setUp(){
-        Function<Collection<? extends String>, Map<String,Long>> mapper;
+        BiFunction<String, Collection<? extends String>, Long> mapper;
 
-        mapper = col -> col.stream().collect(Collectors.groupingBy(l -> l, Collectors.counting()));
+        mapper = (k,v) -> (long)v.size();
         chart = new DelegatingPieChart<>(mapper);
 
         super.init(chart);
@@ -44,17 +45,10 @@ public class DelegatingPieChartTest extends AbstractPieChartTest<String>{
         chart.setTitle("Test Pie Chart");
         chart.setAlpha(0.66);
 
-        chart.add("How");
-        chart.add("Much");
-        chart.add("Wood");
-        chart.add("Would");
-        chart.add("A");
-        chart.add("Woodchuck");
-        chart.add("Chuck");
-        chart.add("If");
-        chart.add("A");
-        chart.add("Woodchuck");
-        chart.addAll(Arrays.asList("Could","Chuck","Wood","?"));
+        String text = "How Much Wood Would A Woodchuck Chuck If A Woodchuck Could Chuck Wood ?";
+        Map<String, Long> words = Stream.of(text.split(" ")).collect(Collectors.groupingBy(k -> k, Collectors.counting()));
+
+        words.forEach((k,v) -> chart.addAll(k, Collections.nCopies(v.intValue(), k)));
 
         assertNotNull(chart.create());
 

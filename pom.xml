@@ -13,7 +13,7 @@
         <jfreechart.version>1.5.0</jfreechart.version>
         <guava.version>28.1-jre</guava.version>
 
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
 
         <java.version>11</java.version>
         <wagon.provider.version>2.6</wagon.provider.version>

@@ -1,0 +1,41 @@
+package vartas.chart.line;
+
+import vartas.chart.Chart.Chart;
+import com.google.common.collect.Multimap.Multimap;
+import java.time.temporal.TemporalUnit.TemporalUnit;
+import java.time.LocalDateTime.LocalDateTime;
+import java.lang.Object.Object;
+import java.lang.String.String;
+import java.util.Optional.Optional;
+import java.util.List.List;
+
+
+classdiagram LineChart{
+    public abstract class LineChart extends Chart{
+        - TemporalUnit granularity;
+        - List<Dataset> entries;
+        - String domainLabel;
+        - String rangeLabel;
+        - Optional<String> secondaryRangeLabel;
+    }
+
+    public abstract class Dataset{
+        - LocalDateTime created;
+        - String label;
+        - Position position;
+        + abstract long getCount();
+    }
+
+    public class ListDataset extends Dataset{
+        - List<Object> entries;
+    }
+
+    public class NumberDataset extends Dataset{
+        - long count;
+    }
+
+    public enum Position{
+        LEFT,
+        RIGHT;
+    }
+}

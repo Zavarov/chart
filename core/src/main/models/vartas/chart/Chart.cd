@@ -1,0 +1,11 @@
+package vartas.chart;
+
+import java.awt.image.BufferedImage.BufferedImage;
+import java.lang.String.String;
+
+classdiagram Chart{
+    public abstract class Chart{
+        - String label;
+        + abstract BufferedImage create(int width, int height);
+    }
+}

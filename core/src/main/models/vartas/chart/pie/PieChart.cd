@@ -1,0 +1,28 @@
+package vartas.chart.pie;
+
+import java.awt.Color.Color;
+import java.lang.String.String;
+import java.lang.Object.Object;
+import java.util.Map.Map;
+import java.util.Optional.Optional;
+import java.util.List.List;
+import vartas.chart.Chart.Chart;
+
+classdiagram PieChart{
+    public abstract class PieChart extends Chart{
+        - Map<String, Dataset> entries;
+    }
+
+    public abstract class Dataset{
+        - Optional<Color> color;
+        + abstract long getCount();
+    }
+
+    public class ListDataset extends Dataset{
+        - List<Object> entries;
+    }
+
+    public class NumberDataset extends Dataset{
+        - long count;
+    }
+}

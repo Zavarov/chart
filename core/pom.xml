@@ -4,12 +4,183 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>chart</artifactId>
-        <groupId>vartas</groupId>
+        <groupId>vartas.chart</groupId>
         <version>2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>core</artifactId>
 
+    <properties>
+        <!-- .. Generator Arguments ................................................................................ -->
+        <generator.main>vartas.monticore.cd4code.Main</generator.main>
+        <generator.models.path>${project.build.directory}/models-resources</generator.models.path>
+        <generator.local-models.path>${project.basedir}/src/main/models</generator.local-models.path>
+        <generator.templates.path>${project.build.directory}/template-resources</generator.templates.path>
+        <generator.local-templates.path>${project.basedir}/src/main/resources/templates</generator.local-templates.path>
+        <generator.sources.directory>${project.basedir}/src/main/java/</generator.sources.directory>
+        <generator.output.directory>${project.basedir}/target/generated-sources/</generator.output.directory>
+        <chart.cd>vartas.chart.Chart</chart.cd>
+        <linechart.cd>vartas.chart.line.LineChart</linechart.cd>
+        <piechart.cd>vartas.chart.pie.PieChart</piechart.cd>
+    </properties>
 
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <!-- MontiCore depends on CharMatcher.WHITESPACE, which was removed June 2018 -->
+            <version>${monticore.guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>vartas.monticore-commons</groupId>
+            <artifactId>cd4code</artifactId>
+            <version>${cd4code.version}</version>
+            <classifier>${templates.classifier}</classifier>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Load the templates for the generator-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>unpack-templates</id>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <outputDirectory>${generator.templates.path}</outputDirectory>
+                            <classifier>${templates.classifier}</classifier>
+                            <includeGroupIds>vartas.monticore-commons</includeGroupIds>
+                            <includeArtifactIds>cd4code</includeArtifactIds>
+                            <includeTypes>jar</includeTypes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-models</id>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <outputDirectory>${generator.models.path}</outputDirectory>
+                            <classifier>${models.classifier}</classifier>
+                            <includeGroupIds>vartas.monticore-commons</includeGroupIds>
+                            <includeArtifactIds>cd4code</includeArtifactIds>
+                            <includeTypes>jar</includeTypes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Code Generation -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${maven-exec-plugin.version}</version>
+                <executions>
+                    <!-- Generate chart classes-->
+                    <execution>
+                        <id>chart</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <includeProjectDependencies>false</includeProjectDependencies>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <mainClass>${generator.main}</mainClass>
+                            <arguments>
+                                <argument>${generator.models.path}</argument>
+                                <argument>${generator.local-models.path}</argument>
+                                <argument>${generator.templates.path}</argument>
+                                <argument>${generator.local-templates.path}</argument>
+                                <argument>${generator.sources.directory}</argument>
+                                <argument>${generator.output.directory}</argument>
+                                <argument>${chart.cd}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- Generate linechart classes-->
+                    <execution>
+                        <id>linechart</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <includeProjectDependencies>false</includeProjectDependencies>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <mainClass>${generator.main}</mainClass>
+                            <arguments>
+                                <argument>${generator.models.path}</argument>
+                                <argument>${generator.local-models.path}</argument>
+                                <argument>${generator.templates.path}</argument>
+                                <argument>${generator.local-templates.path}</argument>
+                                <argument>${generator.sources.directory}</argument>
+                                <argument>${generator.output.directory}</argument>
+                                <argument>${linechart.cd}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- Generate piechart classes-->
+                    <execution>
+                        <id>piechart</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <includeProjectDependencies>false</includeProjectDependencies>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <mainClass>${generator.main}</mainClass>
+                            <arguments>
+                                <argument>${generator.models.path}</argument>
+                                <argument>${generator.local-models.path}</argument>
+                                <argument>${generator.templates.path}</argument>
+                                <argument>${generator.local-templates.path}</argument>
+                                <argument>${generator.sources.directory}</argument>
+                                <argument>${generator.output.directory}</argument>
+                                <argument>${piechart.cd}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>vartas.monticore-commons</groupId>
+                        <artifactId>cd4code</artifactId>
+                        <version>${cd4code.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <!-- Including the generated source files -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${maven-builder-helper-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${generator.output.directory}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

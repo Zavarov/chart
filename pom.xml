@@ -4,20 +4,42 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>vartas</groupId>
+    <groupId>vartas.chart</groupId>
     <artifactId>chart</artifactId>
     <packaging>pom</packaging>
     <version>2.0-SNAPSHOT</version>
     <modules>
         <module>core</module>
+        <module>jfreechart</module>
     </modules>
 
 
     <properties>
+        <!-- .. Libraries ..................................................... -->
         <jfreechart.version>1.5.0</jfreechart.version>
-        <guava.version>28.1-jre</guava.version>
+        <guava.version>30-jre</guava.version>
+        <cd4code.version>2.1-SNAPSHOT</cd4code.version>
+        <monticore.guava.version>25.1-jre</monticore.guava.version>
 
-        <junit.version>4.12</junit.version>
+        <!-- Test -->
+        <junit.version>5.6.0</junit.version>
+        <assertj.version>3.12.2</assertj.version>
+
+        <!-- .. Plugins......................................................... -->
+
+        <maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
+        <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
+        <maven-exec-plugin.version>1.6.0</maven-exec-plugin.version>
+        <maven-source-plugin.version>3.1.0</maven-source-plugin.version>
+        <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <maven-builder-helper-plugin.version>3.0.0</maven-builder-helper-plugin.version>
+        <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+        <maven-shade-plugin.version>3.2.2</maven-shade-plugin.version>
+
+        <!-- .. Misc .......................................................... -->
+        <templates.classifier>templates</templates.classifier>
+        <models.classifier>models</models.classifier>
 
         <java.version>11</java.version>
         <wagon.provider.version>2.6</wagon.provider.version>
@@ -25,44 +47,106 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
-        <maven.compiler.version>3.8.1</maven.compiler.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
+    <!-- == Dependencies ==================================================== -->
+
     <dependencies>
+        <!-- Test Dependencies -->
         <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>jfreechart</artifactId>
-            <version>${jfreechart.version}</version>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
 
-        <!-- Test Libraries         -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Zavarov Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/zavarov/chart</url>
+        </repository>
+    </distributionManagement>
 
-
+    <!-- == DEFAULT BUILD SETTINGS =========================================== -->
     <build>
         <plugins>
+            <!-- Newer version required for JUnit5 -->
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
+            <!-- create sources jar -->
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- create models & templates jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <executions>
+                    <!-- models -->
+                    <execution>
+                        <id>generate-models</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>${models.classifier}</classifier>
+                            <classesDirectory>src/main/models</classesDirectory>
+                        </configuration>
+                    </execution>
+                    <!-- templates -->
+                    <execution>
+                        <id>generate-templates</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>${templates.classifier}</classifier>
+                            <classesDirectory>src/main/resources/templates</classesDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <!-- create docs jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven-javadoc-plugin.version}</version>
+                <configuration>
+                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+                </configuration>
                 <executions>
                     <execution>
                         <id>generate-docs</id>
@@ -71,15 +155,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.version}</version>
-                <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                </configuration>
             </plugin>
         </plugins>
     </build>

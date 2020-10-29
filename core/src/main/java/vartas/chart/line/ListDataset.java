@@ -2,8 +2,8 @@ package vartas.chart.line;
 
 public class ListDataset extends ListDatasetTOP{
     @Override
-    public long getCount() {
-        return this.sizeEntries();
+    public Double getCount() {
+        return (double) this.sizeEntries();
     }
 
     @Override

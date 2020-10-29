@@ -6,6 +6,7 @@ import java.time.temporal.TemporalUnit.TemporalUnit;
 import java.time.LocalDateTime.LocalDateTime;
 import java.lang.Object.Object;
 import java.lang.String.String;
+import java.lang.Double.Double;
 import java.util.Optional.Optional;
 import java.util.List.List;
 
@@ -23,7 +24,7 @@ classdiagram LineChart{
         - LocalDateTime created;
         - String label;
         - Position position;
-        + abstract long getCount();
+        + abstract Double getCount();
     }
 
     public class ListDataset extends Dataset{
@@ -31,7 +32,7 @@ classdiagram LineChart{
     }
 
     public class NumberDataset extends Dataset{
-        - long count;
+        - Double count;
     }
 
     public enum Position{

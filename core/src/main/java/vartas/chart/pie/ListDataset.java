@@ -2,8 +2,8 @@ package vartas.chart.pie;
 
 public class ListDataset extends ListDatasetTOP {
     @Override
-    public Double getCount() {
-        return (double) this.sizeEntries();
+    public Number getCount() {
+        return this.sizeEntries();
     }
 
     @Override

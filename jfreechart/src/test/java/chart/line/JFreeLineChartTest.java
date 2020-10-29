@@ -144,7 +144,7 @@ public class JFreeLineChartTest extends AbstractChartTest<LineChart> {
         return createEntry(count, date, label, Position.LEFT);
     }
 
-    private Dataset createEntry(double count, LocalDateTime date, String label, Position position){
+    private Dataset createEntry(int count, LocalDateTime date, String label, Position position){
         return NumberDatasetFactory.create(
                 count,
                 date,

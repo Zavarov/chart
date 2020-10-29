@@ -32,7 +32,7 @@ public class JFreePieChart extends PieChart {
     }
 
     private DefaultPieDataset createDataSet(){
-        Map<String, Double> data = Maps.transformValues(getEntries(), Dataset::getCount);
+        Map<String, Double> data = Maps.transformValues(getEntries(), value -> Preconditions.checkNotNull(value).getCount().doubleValue());
         DefaultPieDataset dataset = new DefaultPieDataset();
 
         data.entrySet().stream()

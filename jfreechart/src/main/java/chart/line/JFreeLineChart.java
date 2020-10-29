@@ -119,7 +119,7 @@ public class JFreeLineChart extends LineChart {
         //In order to accumulate the data, the creation date is truncated with respect to the granularity
         Map<LocalDateTime, Double> entries = new HashMap<>();
         for(Dataset entry : data) {
-            entries.merge(TRUNCATE.get(getGranularity()).apply(entry.getCreated()), entry.getCount(), Double::sum);
+            entries.merge(TRUNCATE.get(getGranularity()).apply(entry.getCreated()), entry.getCount().doubleValue(), Double::sum);
         }
 
         //Fill the time series with the accumulated data

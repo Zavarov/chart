@@ -7,7 +7,7 @@
     <groupId>vartas.chart</groupId>
     <artifactId>chart</artifactId>
     <packaging>pom</packaging>
-    <version>2.4</version>
+    <version>2.5</version>
     <modules>
         <module>core</module>
         <module>jfreechart</module>
@@ -75,6 +75,13 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/zavarov/monticore-commons/</url>
+        </repository>
+    </repositories>
 
     <distributionManagement>
         <repository>

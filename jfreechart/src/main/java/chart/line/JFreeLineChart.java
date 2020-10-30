@@ -62,8 +62,9 @@ public class JFreeLineChart extends LineChart {
     private void buildLeftRangeAxis(XYPlot plot){
         TimeSeriesCollection data = createTimeSeriesCollection(Position.LEFT);
         NumberAxis axis = new NumberAxis(getRangeLabel());
-        //Always start from 0
-        axis.setLowerBound(0);
+
+        axis.setRange(data.getRangeBounds(true));
+        axis.setLowerBound(Math.min(axis.getLowerBound(), 0));  //Normalize the range by starting from 0, if necessary
 
         plot.setRangeAxis(0, axis);
         plot.setDataset(0, data);
@@ -75,11 +76,13 @@ public class JFreeLineChart extends LineChart {
 
         TimeSeriesCollection data = createTimeSeriesCollection(Position.RIGHT);
         NumberAxis axis = new NumberAxis(getSecondaryRangeLabel().orElseThrow());
-        //Always start from 0
-        axis.setLowerBound(0);
+
+        axis.setRange(data.getRangeBounds(true));
+        axis.setLowerBound(Math.min(axis.getLowerBound(), 0));  //Normalize the range by starting from 0, if necessary
 
         plot.setRangeAxis(1, axis);
         plot.setDataset(1, data);
+        plot.mapDatasetToRangeAxis(1, 1);
     }
 
     private void buildRenderer(XYPlot plot){

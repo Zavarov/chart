@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import vartas.chart.line.Dataset;
 import vartas.chart.line.LineChart;
 import vartas.chart.line.Position;
-import vartas.chart.line.factory.LineChartFactory;
-import vartas.chart.line.factory.NumberDatasetFactory;
+import vartas.chart.line.$factory.LineChartFactory;
+import vartas.chart.line.$factory.NumberDatasetFactory;
 
 import java.awt.*;
 import java.time.LocalDateTime;

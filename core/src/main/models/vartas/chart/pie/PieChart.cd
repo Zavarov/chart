@@ -15,7 +15,7 @@ classdiagram PieChart{
     }
 
     public abstract class Dataset{
-        - Optional<Color> color;
+        - Color color;
         + abstract Number getCount();
     }
 

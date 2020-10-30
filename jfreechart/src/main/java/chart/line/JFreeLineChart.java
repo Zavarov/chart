@@ -6,8 +6,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
-import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.*;
@@ -63,9 +61,11 @@ public class JFreeLineChart extends LineChart {
 
     private void buildLeftRangeAxis(XYPlot plot){
         TimeSeriesCollection data = createTimeSeriesCollection(Position.LEFT);
-        NumberAxis range = new NumberAxis(getRangeLabel());
+        NumberAxis axis = new NumberAxis(getRangeLabel());
+        //Always start from 0
+        axis.setLowerBound(0);
 
-        plot.setRangeAxis(0, range);
+        plot.setRangeAxis(0, axis);
         plot.setDataset(0, data);
     }
 

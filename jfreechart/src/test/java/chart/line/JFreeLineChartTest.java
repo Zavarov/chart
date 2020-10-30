@@ -2,13 +2,12 @@ package chart.line;
 
 import chart.AbstractChartTest;
 import org.junit.jupiter.api.Test;
+import vartas.chart.line.$factory.LineChartFactory;
+import vartas.chart.line.$factory.NumberDatasetFactory;
 import vartas.chart.line.Dataset;
 import vartas.chart.line.LineChart;
 import vartas.chart.line.Position;
-import vartas.chart.line.factory.LineChartFactory;
-import vartas.chart.line.factory.NumberDatasetFactory;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
@@ -34,7 +33,7 @@ public class JFreeLineChartTest extends AbstractChartTest<LineChart> {
 
     @Test
     public void testCreateDual(){
-        chart = createChart("Test Line Chart (Dual)", ChronoUnit.DAYS);
+        chart = createChart("Test Line Chart (Dual)", ChronoUnit.YEARS);
         chart.setSecondaryRangeLabel("Dual");
 
         LocalDateTime start = LocalDateTime.now();
@@ -42,8 +41,8 @@ public class JFreeLineChartTest extends AbstractChartTest<LineChart> {
         for(int i = 0 ; i < 7 ; ++i) {
             chart.addEntries(createEntry(2, start.plusYears(2*i), "A", Position.LEFT));
             chart.addEntries(createEntry(1, start.plusYears(2*i + 1), "A", Position.LEFT));
-            chart.addEntries(createEntry(4, start.plusYears(2*i), "B", Position.RIGHT));
-            chart.addEntries(createEntry(3, start.plusYears(2*i + 1), "B", Position.RIGHT));
+            chart.addEntries(createEntry(400, start.plusYears(2*i), "B", Position.RIGHT));
+            chart.addEntries(createEntry(300, start.plusYears(2*i + 1), "B", Position.RIGHT));
         }
 
         save("LineChartDual");

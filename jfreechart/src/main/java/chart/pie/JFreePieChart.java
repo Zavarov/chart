@@ -8,10 +8,8 @@ import org.jfree.chart.labels.PieSectionLabelGenerator;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
-import vartas.chart.pie.Dataset;
 import vartas.chart.pie.PieChart;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Locale;
 import java.util.Map;
@@ -49,16 +47,7 @@ public class JFreePieChart extends PieChart {
 
     private void assignColors(PiePlot plot){
         forEachEntries((key, value) ->
-            plot.setSectionPaint(key, getColor(key, value))
+            plot.setSectionPaint(key, value.getColor())
         );
-    }
-
-    private Color getColor(String label, Dataset dataset){
-        if(dataset.isPresentColor()){
-            return dataset.getColor().orElseThrow();
-        }else{
-            int hash = label.hashCode();
-            return new Color(hash & 0xFFFFFF);
-        }
     }
 }

@@ -1,0 +1,5 @@
+package java.awt;
+
+classdiagram Color{
+    public class Color{}
+}

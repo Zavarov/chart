@@ -17,6 +17,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build with Maven
-      run: mvn -B package -s ~/.m2/settings.xml --file pom.xml 
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+      run: mvn -B package --file pom.xml 

@@ -42,6 +42,12 @@
         <piechart.cd>vartas.chart.pie.PieChart</piechart.cd>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/zavarov/monticore-commons</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
